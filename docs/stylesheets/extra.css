@@ -1,0 +1,8 @@
+/* Estilos personalizados */
+:root {
+  --md-code-font-family: "Fira Code", monospace;
+}
+
+.md-typeset code {
+  border-radius: 0.2rem;
+}

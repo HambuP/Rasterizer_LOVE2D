@@ -1,0 +1,89 @@
+site_name: Rasterizador LOVE2D
+site_description: CUbito 3d uwu, epico, muy epico
+site_author: HambuP
+repo_url: https://github.com/HambuP/Rasterizador_LOVE2D
+repo_name: HambuP/Rasterizador_LOVE2D
+
+theme:
+  name: material
+  language: es
+  palette:
+    # Modo claro
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+    # Modo oscuro
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  # Matemáticas
+  - pymdownx.arithmatex:
+      generic: true
+  # Código
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  # Contenido
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  # Listas y tablas
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+
+extra_javascript:
+  # MathJax para fórmulas matemáticas
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Inicio: index.md
+  - Comenzar:
+      - Instalación: getting-started/installation.md
+      - Primeros pasos: getting-started/quickstart.md
+  - Conceptos:
+      - Rasterización: concepts/rasterization.md
+      - Cámara 3D: concepts/camera.md
+      - Transformaciones: concepts/transformations.md
+  - API:
+      - Vectores: api/vectors.md
+      - Funciones principales: api/core.md
+  - Ejemplos:
+      - Triángulo básico: examples/basic-triangle.md
+      - Malla 3D: examples/3d-mesh.md
