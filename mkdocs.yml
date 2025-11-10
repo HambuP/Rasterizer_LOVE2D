@@ -1,8 +1,9 @@
 site_name: Rasterizador LOVE2D
-site_description: Cubito 3d uwu, epico, muy epico
+site_description: Motor de renderizado 3D por software en Lua - Documentación completa con explicaciones matemáticas
 site_author: HambuP
 repo_url: https://github.com/HambuP/Rasterizador_LOVE2D
 repo_name: HambuP/Rasterizador_LOVE2D
+edit_uri: ""
 
 theme:
   name: material
@@ -31,10 +32,15 @@ theme:
     - navigation.top
     - navigation.instant
     - navigation.tracking
+    - navigation.expand
     - search.suggest
     - search.highlight
+    - search.share
     - content.code.copy
     - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
 
 markdown_extensions:
   # Matemáticas
@@ -67,9 +73,17 @@ markdown_extensions:
   - pymdownx.tasklist:
       custom_checkbox: true
   - tables
+  # Extras
+  - footnotes
+  - pymdownx.mark
+  - pymdownx.critic
+  - pymdownx.keys
+  - toc:
+      permalink: true
+      toc_depth: 3
 
 extra_javascript:
-  # MathJax para fórmulas matemáticas
+  # MathJax para fórmulas matemáticas LaTeX
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
@@ -77,18 +91,37 @@ extra_javascript:
 extra_css:
   - stylesheets/extra.css
 
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/HambuP/Rasterizador_LOVE2D
+      name: Repositorio en GitHub
+  analytics:
+    feedback:
+      title: ¿Fue útil esta página?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: Muy útil
+          data: 1
+          note: >-
+            Gracias por tu feedback!
+        - icon: material/emoticon-sad-outline
+          name: Podría mejorar
+          data: 0
+          note: >-
+            Gracias! Ayúdanos a mejorar reportando issues en GitHub.
+
 nav:
   - Inicio: index.md
-  - Comenzar:
-      - Instalación: getting-started/installation.md
-      - Primeros pasos: getting-started/quickstart.md
-  - Conceptos:
-      - Rasterización: concepts/rasterization.md
-      - Cámara 3D: concepts/camera.md
-      - Transformaciones: concepts/transformations.md
-  - API:
-      - Vectores: api/vectors.md
-      - Funciones principales: api/core.md
-  - Ejemplos:
-      - Triángulo básico: examples/basic-triangle.md
-      - Malla 3D: examples/3d-mesh.md
+  - Guías:
+      - Conceptos Fundamentales: conceptos.md
+      - Matemáticas Completas: matematicas.md
+  - Referencia:
+      - API de Vectores: api_vectores.md
+  - Acerca:
+      - Licencia: https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE
+      - Código Fuente: https://github.com/HambuP/Rasterizador_LOVE2D
+
+plugins:
+  - search:
+      lang: es

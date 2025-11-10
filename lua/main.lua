@@ -1,11 +1,78 @@
 
-local vec = require("vectors") --hola
+--[[
+═════════════════════════════════════════════════════════════════════════════
+RASTERIZADOR 3D EN LÖVE2D
+═════════════════════════════════════════════════════════════════════════════
+
+Motor de renderizado 3D por software que implementa el pipeline de gráficos
+completo sin usar aceleración por hardware (OpenGL/DirectX).
+
+COMPONENTES PRINCIPALES:
+  1. Sistema de cámara con controles FPS (yaw, pitch, movimiento WASD)
+  2. Transformaciones 3D (rotación, traslación, cambio de base)
+  3. Proyección en perspectiva con FOV configurable
+  4. Triangulación de caras poligonales (triangular fan)
+  5. Rasterización de triángulos con z-buffer
+  6. Interpolación baricéntrica perspective-correct
+  7. Gestión de escena 3D con múltiples figuras
+
+PIPELINE DE RENDERING:
+  Modelo 3D → Transformación mundial → Espacio de cámara → Proyección 2D →
+  Triangulación → Clipping → Rasterización → Z-buffer → Pantalla
+
+MATEMÁTICA CLAVE:
+  - Matrices de rotación (Euler angles)
+  - Proyección en perspectiva
+  - Coordenadas baricéntricas
+  - Interpolación perspective-correct
+  - Z-buffering para visibilidad
+
+AUTOR: HambuP
+FRAMEWORK: LÖVE2D (love2d.org)
+LICENCIA: MIT
+═════════════════════════════════════════════════════════════════════════════
+]]--
+
+local vec = require("vectors")
 local love = require("love")
 
 package.path = package.path .. ";../?.lua;../?/init.lua;./?.lua;./?/init.lua"
 local inspect = require("inspect")
 
------- cámara / entrada ------
+--[[
+═════════════════════════════════════════════════════════════════════════════
+SECCIÓN 1: SISTEMA DE CÁMARA Y ENTRADA
+═════════════════════════════════════════════════════════════════════════════
+]]--
+
+--[[
+FUNCIÓN: love.mousemoved(x, y, dx, dy)
+Callback de LÖVE2D para manejo de movimiento del ratón.
+Controla la orientación de la cámara (yaw y pitch).
+
+PARÁMETROS:
+  x, y: Posición absoluta del ratón (ignorados)
+  dx, dy: Desplazamiento incremental en píxeles
+
+MATEMÁTICA:
+  yaw_nuevo = yaw_viejo + dx × sensibilidad
+  pitch_nuevo = clamp(pitch_viejo + dy × sensibilidad, -lim, +lim)
+
+  Donde:
+    sensibilidad = 0.0015 rad/píxel
+    lim = 1.45 rad ≈ 83.07° (evita gimbal lock en ±90°)
+
+CONVENCIONES:
+  - yaw: Rotación horizontal (sin límite, puede dar vueltas completas)
+  - pitch: Rotación vertical (limitada a ±83° para evitar volteo)
+  - dx > 0: Girar a la derecha (incrementa yaw)
+  - dy > 0: Mirar hacia abajo (incrementa pitch)
+
+NOTA DE IMPLEMENTACIÓN:
+  El límite de pitch a ±1.45 rad previene que la cámara se voltee
+  completamente (gimbal lock) lo que causaría comportamiento confuso
+  en controles FPS.
+]]--
 function love.mousemoved(_, _, dx, dy)
   local sens = 0.0015
   cam.yaw   = cam.yaw   + dx * sens
@@ -15,7 +82,54 @@ function love.mousemoved(_, _, dx, dy)
   if cam.pitch < -lim then cam.pitch = -lim end
 end
 
------- helpers geométricos ------
+--[[
+═════════════════════════════════════════════════════════════════════════════
+SECCIÓN 2: HELPERS GEOMÉTRICOS Y TRANSFORMACIONES
+═════════════════════════════════════════════════════════════════════════════
+]]--
+
+--[[
+FUNCIÓN: triangular_fan(cara)
+Convierte un polígono convexo en triángulos usando el algoritmo
+"triangular fan" (abanico triangular).
+
+PARÁMETROS:
+  cara: Lista de índices de vértices [v1, v2, v3, ..., vn]
+
+RETORNA: Lista de triángulos {{v1,v2,v3}, {v1,v3,v4}, ...}
+
+ALGORITMO:
+  Para un polígono de n vértices, genera (n-2) triángulos:
+    Triángulo 1: [v1, v2, v3]
+    Triángulo 2: [v1, v3, v4]
+    Triángulo 3: [v1, v4, v5]
+    ...
+    Triángulo (n-2): [v1, v(n-1), vn]
+
+VISUALIZACIÓN (Quad):
+  Entrada: [v1, v2, v3, v4]
+
+     v1 -------- v2
+     | \         |
+     |   \   △1  |
+     |     \     |
+     | △2    \   |
+     |         \ |
+     v4 -------- v3
+
+  Salida: {{v1,v2,v3}, {v1,v3,v4}}
+
+REQUISITOS:
+  - El polígono DEBE ser convexo
+  - Los vértices DEBEN estar en orden (CCW o CW consistente)
+  - Mínimo 3 vértices (triángulo)
+
+COMPLEJIDAD: O(n) donde n = número de vértices
+
+NOTA: Este método no funciona con polígonos cóncavos.
+Para esos casos se requiere triangulación por ear clipping u otros
+algoritmos más complejos.
+]]--
 local function triangular_fan(cara)
   local o = cara[1]
   local tris = {}
@@ -25,6 +139,42 @@ local function triangular_fan(cara)
   return tris
 end
 
+--[[
+FUNCIÓN: build_cam_mats()
+Construye las matrices de rotación de la cámara.
+
+RETORNA:
+  1. Rcam: Matriz de rotación de la cámara
+  2. RcamT: Inversa de Rcam (= transpuesta para matrices ortonormales)
+
+MATEMÁTICA:
+  R_cam = R_y(yaw) × R_x(pitch)
+
+  Esta composición primero aplica rotación vertical (pitch) y luego
+  rotación horizontal (yaw), correspondiendo a controles FPS naturales.
+
+  La matriz resultante transforma vectores del sistema de coordenadas
+  mundial al sistema de coordenadas de la cámara.
+
+INVERSA ORTONORMAL:
+  Como R_cam es ortonormal (preserva longitudes y ángulos):
+    R_cam⁻¹ = R_camᵀ
+
+  Esto ahorra cálculo costoso de inversión matricial general.
+
+APLICACIÓN:
+  Para transformar un vector v del mundo a cámara:
+    v_camera = RcamT × (v_world - cam.pos)
+
+  Pasos:
+    1. Trasladar el mundo para centrar la cámara: v_world - cam.pos
+    2. Rotar al sistema de coordenadas de cámara: RcamT × v_rel
+
+CONVENCIÓN DE EJES (cámara):
+  - +X: Derecha
+  - +Y: Arriba
+  - +Z: Atrás (convención OpenGL, cámara mira hacia -Z)
+]]--
 local function build_cam_mats()
   -- R_cam = R_y(yaw) * R_x(pitch)
   local Ry = vec.rota_y(cam.yaw)
@@ -33,6 +183,67 @@ local function build_cam_mats()
   return Rcam, vec.transpose(Rcam)  -- inversa ortonormal = traspuesta
 end
 
+--[[
+FUNCIÓN: proyectar_vertices(vertices, fov, width, height)
+Proyecta vértices 3D (en espacio de cámara) a coordenadas 2D de pantalla
+usando proyección en perspectiva.
+
+PARÁMETROS:
+  vertices: Lista de vértices 3D en espacio de cámara {x, y, z}
+  fov: Campo de visión vertical en grados
+  width, height: Resolución del viewport en píxeles
+
+RETORNA:
+  Lista de vértices proyectados {x_screen, y_screen} o nil si está
+  detrás del plano cercano (near plane)
+
+MATEMÁTICA:
+  La proyección en perspectiva simula cómo objetos lejanos se ven
+  más pequeños (proporcional a 1/z).
+
+  1. CÁLCULO DE DISTANCIA FOCAL:
+     f_y = (height/2) / tan(fov/2)
+     f_x = f_y  (asume aspect ratio 1:1 para simplificar)
+
+  2. PROYECCIÓN:
+     x_ndc = x_cam / z_cam
+     y_ndc = y_cam / z_cam
+
+     Donde NDC (Normalized Device Coordinates) va de -1 a +1.
+
+  3. CONVERSIÓN A COORDENADAS DE PANTALLA:
+     x_screen = f_x × (x_cam/z_cam) + (width/2)
+     y_screen = (height/2) - f_y × (y_cam/z_cam)
+
+     Nota: El signo negativo en y_screen es porque en pantalla
+     el eje Y crece hacia abajo, pero en 3D crece hacia arriba.
+
+  4. NEAR CLIPPING:
+     Si z_cam ≤ near = 0.001, el vértice se descarta (retorna nil).
+     Esto evita divisiones por cero y proyecciones incorrectas de
+     geometría detrás de la cámara.
+
+MATRIZ DE PROYECCIÓN EQUIVALENTE (no usada aquí directamente):
+  ┌                                    ┐
+  │ f_x/aspect    0        0        0  │
+  │     0        f_y       0        0  │
+  │     0         0    (f+n)/(n-f) 2fn/(n-f) │
+  │     0         0       -1        0  │
+  └                                    ┘
+
+  Donde f=far plane, n=near plane. Aquí se implementa la proyección
+  de forma simplificada sin far clipping.
+
+EJEMPLO NUMÉRICO:
+  FOV = 60°, height = 580px, width = 820px
+  f_y = (580/2) / tan(π/6) = 290 / 0.577 ≈ 502
+
+  Para un vértice en (1, 0, 2):
+    x_screen = 502 × (1/2) + 410 = 251 + 410 = 661px
+    y_screen = 290 - 502 × (0/2) = 290px
+
+COMPLEJIDAD: O(n) donde n = número de vértices
+]]--
 local function proyectar_vertices(vertices, fov, width, height)
   local proyectados = {}
   local fov_rad = math.rad(fov)
@@ -430,16 +641,139 @@ end
 end
 
 ------ z-buffer software ------
+--[[
+═════════════════════════════════════════════════════════════════════════════
+SECCIÓN 3: ALGORITMOS DE RASTERIZACIÓN
+═════════════════════════════════════════════════════════════════════════════
+]]--
+
+--[[
+FUNCIÓN: edge(x0, y0, x1, y1, x, y)
+Calcula la función de arista (edge function) para determinar en qué lado
+de una línea se encuentra un punto.
+
+PARÁMETROS:
+  x0, y0: Punto inicial de la arista
+  x1, y1: Punto final de la arista
+  x, y: Punto a evaluar
+
+RETORNA:
+  Valor escalar (positivo, negativo o cero)
+
+MATEMÁTICA:
+  Edge function es el producto cruz 2D de dos vectores:
+    E(P) = (P - P₀) × (P₁ - P₀)
+    E(P) = (x - x₀)(y₁ - y₀) - (y - y₀)(x₁ - x₀)
+
+  INTERPRETACIÓN GEOMÉTRICA:
+    E(P) > 0  ⟹  P está a la IZQUIERDA de la arista P₀→P₁
+    E(P) < 0  ⟹  P está a la DERECHA de la arista P₀→P₁
+    E(P) = 0  ⟹  P está SOBRE la arista P₀→P₁
+
+  Para un triángulo (v₁, v₂, v₃) en sentido CCW (counter-clockwise):
+    E₁₂(P) ≥ 0  ∧  E₂₃(P) ≥ 0  ∧  E₃₁(P) ≥ 0  ⟹  P dentro del triángulo
+
+RELACIÓN CON COORDENADAS BARICÉNTRICAS:
+  Las coordenadas baricéntricas λᵢ se obtienen normalizando:
+    λ₁ = E₂₃(P) / E₂₃(v₁)
+    λ₂ = E₃₁(P) / E₃₁(v₂)
+    λ₃ = E₁₂(P) / E₁₂(v₃)
+
+  Donde E₂₃(v₁) es el doble del área del triángulo completo.
+
+VENTAJAS:
+  - Test de inclusión muy eficiente (solo 3 multiplicaciones + 3 restas)
+  - Funciona perfectamente con rasterización scanline
+  - Proporciona coordenadas baricéntricas de forma natural
+
+APLICACIONES:
+  - Rasterización de triángulos
+  - Detección de colisiones 2D
+  - Interpolación de atributos (color, textura, profundidad)
+]]--
 local function edge(x0,y0, x1,y1, x,y)
   return (x - x0)*(y1 - y0) - (y - y0)*(x1 - x0)
 end
 
+--[[
+FUNCIÓN: clear_buffers()
+Limpia el z-buffer y el buffer de color para un nuevo frame.
+
+OPERACIONES:
+  1. Z-buffer: Inicializa todos los píxeles a profundidad infinita (math.huge)
+  2. Color buffer: Establece todos los píxeles a negro (0, 0, 0, 1)
+
+MATEMÁTICA DEL Z-BUFFER:
+  Para cada píxel se almacena la profundidad z del fragmento más cercano:
+    zbuf[píxel] = min(z₁, z₂, ..., zₙ)
+
+  Inicializar a ∞ asegura que cualquier geometría visible será dibujada:
+    z_nuevo < ∞  ⟹  píxel se dibuja
+
+COMPLEJIDAD: O(RENDER_W × RENDER_H) = O(820 × 580) ≈ O(476,000)
+]]--
 local function clear_buffers()
   for i = 1, RENDER_W*RENDER_H do zbuf[i] = math.huge end
   imgData:mapPixel(function() return 0,0,0,1 end)
 end
 
--- Reúne triángulos y descarta degenerados/near (backface culling en rasterización)
+--[[
+FUNCIÓN: gather_tris(figs, vc_all, vs_all, face_colors)
+Recolecta y filtra triángulos válidos para rasterización.
+Aplica clipping y descarta geometría degenerada.
+
+PARÁMETROS:
+  figs: Lista de figuras 3D (cada una con vértices y caras)
+  vc_all: Vértices transformados en espacio de cámara (3D)
+  vs_all: Vértices proyectados en espacio de pantalla (2D)
+  face_colors: Colores asignados por cara
+
+RETORNA:
+  Lista de triángulos válidos con estructura:
+    {p1, p2, p3, z1, z2, z3, color}
+
+ALGORITMO:
+  1. Para cada figura:
+     a. Triangular cada cara (polígono → triángulos)
+     b. Validar vértices (todos deben estar definidos)
+     c. CLIPPING: Descartar si z ≤ near plane (1e-3)
+     d. DEGENERACY TEST: Descartar si área < ε (1e-6)
+     e. Agregar triángulo válido a la lista
+
+MATEMÁTICA:
+
+  NEAR PLANE CLIPPING:
+    Condición: z₁ > near ∧ z₂ > near ∧ z₃ > near
+    Donde near = 0.001
+
+    Esto evita:
+      - Divisiones por cero en proyección
+      - Geometría detrás de la cámara
+      - Triángulos que cruzan el plano de cámara (simplificación)
+
+  DEGENERACY TEST:
+    Área del triángulo en 2D:
+      A = ½ |det([p₂-p₁, p₃-p₁])|
+      A = ½ |(x₂-x₁)(y₃-y₁) - (y₂-y₁)(x₃-x₁)|
+
+    Si |2A| < ε = 1e-6  ⟹  triángulo colapsado (degenerado)
+
+    Causas de degeneración:
+      - Triángulo muy pequeño en pantalla
+      - Triángulo visto de lado (edge-on)
+      - Vértices colineales
+
+NOTA SOBRE BACKFACE CULLING:
+  Este código NO hace backface culling aquí. El comentario original
+  menciona "backface culling en rasterización" pero no se implementa
+  explícitamente. En teoría, triángulos back-facing tendrían área
+  negativa y podrían ser descartados con:
+    if area2 < -EPS then discard end
+
+  Sin embargo, en este rasterizador se dibujan ambas caras.
+
+COMPLEJIDAD: O(F × T) donde F = figuras, T = triángulos promedio por figura
+]]--
 local function gather_tris(figs, vc_all, vs_all, face_colors)
   local tris = {}
   local near = 1e-3
@@ -476,7 +810,143 @@ local function gather_tris(figs, vc_all, vs_all, face_colors)
   return tris
 end
 
--- Rasteriza todos los triángulos con z-buffer (no ordena)
+--[[
+FUNCIÓN: rasterize_with_zbuffer(tris, winW, winH)
+Núcleo del motor de rendering: rasteriza triángulos con z-buffering.
+
+PARÁMETROS:
+  tris: Lista de triángulos a dibujar
+  winW, winH: Dimensiones de la ventana (para escalar coordenadas)
+
+ALGORITMO COMPLETO:
+
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 1. LIMPIAR BUFFERS (z-buffer y color)                      │
+  └─────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 2. PARA CADA TRIÁNGULO:                                     │
+  │    a. Escalar vértices a resolución de render               │
+  │    b. Calcular bounding box del triángulo                   │
+  │    c. Calcular área (para coordenadas baricéntricas)        │
+  └─────────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │ 3. PARA CADA PÍXEL EN BOUNDING BOX:                         │
+  │    a. Calcular coordenadas baricéntricas (w₁, w₂, w₃)      │
+  │    b. TEST DE INCLUSIÓN: w₁≥0 ∧ w₂≥0 ∧ w₃≥0 ?              │
+  │    c. Interpolar profundidad (perspective-correct)          │
+  │    d. Z-BUFFER TEST: z < zbuf[píxel] ?                      │
+  │    e. Actualizar z-buffer y dibujar píxel                   │
+  └─────────────────────────────────────────────────────────────┘
+
+MATEMÁTICA DETALLADA:
+
+  1. ESCALADO DE VÉRTICES:
+     Transforma de coordenadas de ventana a resolución de render:
+       sx = RENDER_W / winW
+       sy = RENDER_H / winH
+       (x', y') = (x × sx, y × sy)
+
+  2. BOUNDING BOX:
+     Optimización para evitar testar todos los píxeles de la pantalla:
+       minx = max(0, floor(min(x₁, x₂, x₃)))
+       maxx = min(RENDER_W-1, floor(max(x₁, x₂, x₃)))
+       miny = max(0, floor(min(y₁, y₂, y₃)))
+       maxy = min(RENDER_H-1, floor(max(y₁, y₂, y₃)))
+
+     NOTA: Se clampea a los límites del render buffer.
+
+  3. COORDENADAS BARICÉNTRICAS:
+     Para un triángulo (v₁, v₂, v₃), cualquier punto P se expresa como:
+       P = w₁v₁ + w₂v₂ + w₃v₃
+       donde w₁ + w₂ + w₃ = 1
+
+     CÁLCULO:
+       A = edge(v₁, v₂, v₃) = doble del área del triángulo
+       w₁ = edge(v₂, v₃, P) / A
+       w₂ = edge(v₃, v₁, P) / A
+       w₃ = 1 - w₁ - w₂
+
+     INTERPRETACIÓN:
+       - w₁ = 0 cuando P está sobre arista v₂v₃
+       - w₁ = 1 cuando P está en v₁
+       - w₁ ∈ (0,1) cuando P está dentro del triángulo
+
+  4. TEST DE INCLUSIÓN:
+     P está dentro del triángulo si y solo si:
+       w₁ ≥ 0  ∧  w₂ ≥ 0  ∧  w₃ ≥ 0
+
+     Esto funciona porque coordenadas baricéntricas son las
+     "distancias normalizadas" a cada vértice.
+
+  5. INTERPOLACIÓN PERSPECTIVE-CORRECT:
+     PROBLEMA: Interpolación lineal en espacio de pantalla es incorrecta
+     para perspectiva, porque la proyección no preserva razones lineales.
+
+     SOLUCIÓN: Interpolar 1/z linealmente en espacio de pantalla:
+       1/z_P = w₁(1/z₁) + w₂(1/z₂) + w₃(1/z₃)
+       z_P = 1 / (1/z_P)
+
+     DEMOSTRACIÓN:
+       En espacio de proyección, x_screen = fx/z, y_screen = fy/z
+       La proyección divide por z, causando distorsión no-lineal.
+
+       Para cualquier atributo u (textura, color, etc.):
+         u_correcto = (w₁u₁/z₁ + w₂u₂/z₂ + w₃u₃/z₃) / (1/z_P)
+
+       Esto recupera la interpolación lineal en 3D.
+
+  6. Z-BUFFER TEST:
+     El z-buffer resuelve el problema de visibilidad:
+       "¿Qué superficie está más cerca de la cámara?"
+
+     ALGORITMO:
+       if z_actual < z_almacenado[píxel]:
+         z_almacenado[píxel] = z_actual
+         dibujar píxel con color del triángulo
+
+     VENTAJAS:
+       - No requiere ordenar triángulos (Painter's algorithm)
+       - Maneja correctamente intersecciones complejas
+       - Complejidad O(n) en número de triángulos (independiente de orden)
+
+     DESVENTAJAS:
+       - Requiere memoria adicional (4 bytes por píxel)
+       - No maneja transparencia correctamente
+       - Puede tener problemas de precisión (z-fighting)
+
+  7. SAMPLING POINT:
+     px, py = x + 0.5, y + 0.5
+
+     Se evalúa en el centro del píxel (no en la esquina) para:
+       - Mejorar precisión de coordenadas baricéntricas
+       - Asegurar consistencia con reglas de fill de GPU
+       - Evitar artefactos de aliasing en bordes
+
+COMPLEJIDAD:
+  - Mejor caso: O(T) si todos los triángulos son pequeños
+  - Peor caso: O(T × W × H) si todos los triángulos cubren la pantalla
+  - Caso promedio: O(T × Ā) donde Ā = área promedio de triángulo en píxeles
+
+OPTIMIZACIONES IMPLEMENTADAS:
+  ✓ Bounding box (evita testar píxeles fuera del triángulo)
+  ✓ Pre-cómputo de 1/A (evita división en inner loop)
+  ✓ Interpolación incremental de coordenadas baricéntricas (implícita)
+
+OPTIMIZACIONES POSIBLES (NO implementadas):
+  ✗ Block-based rasterization (testar 8×8 bloques)
+  ✗ Hierarchical z-buffer (early rejection de triángulos ocultos)
+  ✗ Scanline rasterization (solo iterar píxeles en cada scanline)
+  ✗ SIMD/parallelization (procesar múltiples píxeles simultáneamente)
+
+NOTA HISTÓRICA:
+  Este algoritmo es similar al usado en software renderers de los 90s
+  (Quake, Doom) pero simplificado. GPU modernas usan arquitecturas
+  basadas en tiles y parallel rasterization.
+]]--
 local function rasterize_with_zbuffer(tris, winW, winH)
   clear_buffers()
   local sx, sy = RENDER_W / winW, RENDER_H / winH
@@ -488,29 +958,38 @@ local function rasterize_with_zbuffer(tris, winW, winH)
     local x2,y2 = T.p2[1]*sx, T.p2[2]*sy
     local x3,y3 = T.p3[1]*sx, T.p3[2]*sy
 
+    -- Bounding box del triángulo (clampeado a screen bounds)
     local minx = math.max(0, math.floor(math.min(x1,x2,x3)))
     local maxx = math.min(RENDER_W-1, math.floor(math.max(x1,x2,x3)))
     local miny = math.max(0, math.floor(math.min(y1,y2,y3)))
     local maxy = math.min(RENDER_H-1, math.floor(math.max(y1,y2,y3)))
 
+    -- Área del triángulo (doble)
     local A = edge(x1,y1, x2,y2, x3,y3)
     if A ~= 0 then
       local invA = 1.0 / A
-      -- profundidad perspective-correct (estable)
+      -- Profundidad perspective-correct: interpolar 1/z linealmente
       local invz1 = 1.0 / T.z1
       local invz2 = 1.0 / T.z2
       local invz3 = 1.0 / T.z3
 
       for y = miny, maxy do
         for x = minx, maxx do
+          -- Evaluar en el centro del píxel
           local px, py = x + 0.5, y + 0.5
+
+          -- Coordenadas baricéntricas
           local w1 = edge(x2,y2, x3,y3, px,py) * invA
           local w2 = edge(x3,y3, x1,y1, px,py) * invA
           local w3 = 1.0 - w1 - w2
-          -- regla de fill que acepta ambos sentidos de arista
-          if (w1>=0 and w2>=0 and w3>=0)   then --or (w1<=0 and w2<=0 and w3<=0)
+
+          -- Test de inclusión (dentro del triángulo?)
+          if (w1>=0 and w2>=0 and w3>=0) then
+            -- Interpolar profundidad (perspective-correct)
             local invz = w1*invz1 + w2*invz2 + w3*invz3
             local z = 1.0 / invz
+
+            -- Z-buffer test
             local idx = y*RENDER_W + x + 1
             if z < zbuf[idx] then
               zbuf[idx] = z
