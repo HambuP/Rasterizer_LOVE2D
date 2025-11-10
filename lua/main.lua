@@ -439,7 +439,7 @@ local function clear_buffers()
   imgData:mapPixel(function() return 0,0,0,1 end)
 end
 
--- Reúne triángulos (sin culling) y descarta degenerados/near
+-- Reúne triángulos y descarta degenerados/near (backface culling en rasterización)
 local function gather_tris(figs, vc_all, vs_all, face_colors)
   local tris = {}
   local near = 1e-3
