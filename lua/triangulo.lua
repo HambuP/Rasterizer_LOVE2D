@@ -34,7 +34,7 @@ local function fill_triangle2D(imgData, W, H, p1, p2, p3, color)
       local w2 = edge(x3,y3, x1,y1, px,py) * invA
       local w3 = 1.0 - w1 - w2
 
-      if (w1>=0 and w2>=0 and w3>=0) or (w1<=0 and w2<=0 and w3<=0) then
+      if w1>=0 and w2>=0 and w3>=0 then
         imgData:setPixel(x, y, r, g, b, a)
       end
     end

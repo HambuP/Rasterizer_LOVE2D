@@ -159,22 +159,7 @@ $$
     local maxy = clamp(math.floor(math.max(y1, y2, y3)), 0, H-1)
 ```
 
-Instead of testing all 57,600 pixels in a 320×180 buffer, we only test pixels in the **smallest rectangle** that contains the triangle.
-
-**Example:**
-
-```
-Screen (320×180)          Bounding Box (only test this region)
-┌────────────────┐        ┌──────────┐
-│                │        │  *       │
-│                │   →    │ / \      │
-│    *           │        │/   \     │
-│   /|\          │        └──────────┘
-│  / | \         │        (saves ~98% of pixel tests!)
-│ /  |  \        │
-│*───|───*       │
-└────────────────┘
-```
+Instead of testing all 57,600 pixels in a 320×180 buffer, we only test pixels in the **smallest rectangle** that contains the triangle. This optimization can save ~98% of pixel tests!
 
 ### Step 3: Test Each Pixel
 
@@ -237,27 +222,20 @@ v3           v2
 ### Step 5: Inside Test and Drawing
 
 ```lua
-            if (w1>=0 and w2>=0 and w3>=0) or (w1<=0 and w2<=0 and w3<=0) then
+            if w1>=0 and w2>=0 and w3>=0 then
                 imgData:setPixel(x, y, r, g, b, a)
             end
 ```
 
-**Why two conditions?**
+**The CCW Rule:**
 
-- **(w1≥0 ∧ w2≥0 ∧ w3≥0)**: Point is inside a **CCW** (counter-clockwise) triangle
-- **(w1≤0 ∧ w2≤0 ∧ w3≤0)**: Point is inside a **CW** (clockwise) triangle
+A point is inside the triangle if all three barycentric coordinates are non-negative:
 
-This makes the function work regardless of winding order!
+- $w_1 \geq 0$ → Point is to the right of edge $v_2 \to v_3$
+- $w_2 \geq 0$ → Point is to the right of edge $v_3 \to v_1$
+- $w_3 \geq 0$ → Point is to the right of edge $v_1 \to v_2$
 
-**Winding order matters:**
-
-```
-CCW (Counter-Clockwise)    CW (Clockwise)
-    v1                          v1
-    *                           *
-   / \                         / \
-  v3─v2                       v2─v3
-```
+**Important:** Our triangles **must be defined in CCW (counter-clockwise) order** for this test to work correctly. If vertices are in CW order, the test will fail and nothing will be drawn.
 
 ---
 
