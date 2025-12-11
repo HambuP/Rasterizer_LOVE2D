@@ -1,4 +1,4 @@
-# 3D Software Rasterizer
+# 🧊 3D Software Rasterizer
 
 A simple 3D software rasterizer built from scratch in Lua using LÖVE2D. No GPU acceleration—just pure CPU rendering to understand how 3D graphics work.
 
