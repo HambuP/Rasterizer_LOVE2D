@@ -170,18 +170,18 @@ To move the camera in a direction, we update its position:
 **Moving forward:**
 $$
 \begin{aligned}
-\text{cam.pos.x} &= \text{cam.pos.x} + \text{forward}_x \times \text{speed} \times \Delta t \\
-\text{cam.pos.y} &= \text{cam.pos.y} + \text{forward}_y \times \text{speed} \times \Delta t \\
-\text{cam.pos.z} &= \text{cam.pos.z} + \text{forward}_z \times \text{speed} \times \Delta t
+\text{cam.pos.x} &+= \text{forward}_x \times \text{speed} \times \Delta t \\
+\text{cam.pos.y} &+= \text{forward}_y \times \text{speed} \times \Delta t \\
+\text{cam.pos.z} &+= \text{forward}_z \times \text{speed} \times \Delta t
 \end{aligned}
 $$
 
 **Strafing right:**
 $$
 \begin{aligned}
-\text{cam.pos.x} &= \text{cam.pos.x} + \text{right}_x \times \text{speed} \times \Delta t \\
-\text{cam.pos.y} &= \text{cam.pos.y} + \text{right}_y \times \text{speed} \times \Delta t \\
-\text{cam.pos.z} &= \text{cam.pos.z} + \text{right}_z \times \text{speed} \times \Delta t
+\text{cam.pos.x} &+= \text{right}_x \times \text{speed} \times \Delta t \\
+\text{cam.pos.y} &+= \text{right}_y \times \text{speed} \times \Delta t \\
+\text{cam.pos.z} &+= \text{right}_z \times \text{speed} \times \Delta t
 \end{aligned}
 $$
 
@@ -309,28 +309,6 @@ local function project_to_screen(point_camera, fov, width, height)
   return x_screen, y_screen
 end
 ```
-
----
-
-## Matrix Multiplication Order Matters
-
-A critical reminder: **matrix multiplication is not commutative**.
-
-$$
-A \times B \neq B \times A
-$$
-
-In our camera system:
-
-- $R_y \times R_x$ applies pitch **after** yaw ✅
-- $R_x \times R_y$ applies yaw **after** pitch ❌ (gives different result)
-
-Similarly, when transforming points:
-
-- $R_{cam}^T \times \mathbf{p}$ rotates the point correctly ✅
-- $\mathbf{p} \times R_{cam}^T$ doesn't make mathematical sense ❌
-
-Always pay attention to the **order** when working with matrices!
 
 ---
 
