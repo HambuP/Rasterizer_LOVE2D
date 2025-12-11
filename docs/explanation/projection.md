@@ -146,20 +146,6 @@ $$
 
 **Note the minus sign for $y$!** In camera space, $+y$ points **up**. In screen space, $+y$ points **down**.
 
-### Coordinate Systems
-
-```
-Camera Space               Screen Space
-    +y                          (0,0)──────+x
-     │                            │
-     │                            │
-─────┼─────+x                     │
-     │                            +y
-    -y
-
-(0,0) = center            (0,0) = top-left corner
-```
-
 ---
 
 ## Complete Projection Algorithm
@@ -188,46 +174,6 @@ function project_point_to_screen(point_world, camera, fov, width, height)
     return x_screen, y_screen
 end
 ```
-
----
-
-## Example Calculation
-
-Let's project a point step by step:
-
-**Given:**
-- Point: $(x=2, y=1, z=5)$
-- Camera: $(c_x=0, c_y=0, c_z=0)$
-- FOV: $60°$
-- Screen: $800 \times 600$ pixels
-
-**Step 1:** Camera space
-$$
-(x_{rel}, y_{rel}, z_{rel}) = (2, 1, 5)
-$$
-
-**Step 2:** Focal length
-$$
-f = \frac{600/2}{\tan(30°)} = \frac{300}{0.577} \approx 519.6
-$$
-
-**Step 3:** Project
-$$
-\begin{aligned}
-x_{proj} &= 519.6 \times \frac{2}{5} = 207.8 \\
-y_{proj} &= 519.6 \times \frac{1}{5} = 103.9
-\end{aligned}
-$$
-
-**Step 4:** Screen coordinates
-$$
-\begin{aligned}
-x_{screen} &= 207.8 + 400 = 607.8 \text{ px} \\
-y_{screen} &= 300 - 103.9 = 196.1 \text{ px}
-\end{aligned}
-$$
-
-**Result:** The point appears at pixel $(608, 196)$ on the screen.
 
 ---
 
