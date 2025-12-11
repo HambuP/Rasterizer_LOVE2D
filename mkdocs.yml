@@ -12,20 +12,20 @@ theme:
     text: Poppins
     code: Roboto Mono
   palette:
-    # Modo oscuro por defecto (primero en la lista)
+    # Dark mode (default)
     - scheme: slate
-      primary: deep purple
-      accent: purple
+      primary: blue grey
+      accent: cyan
       toggle:
         icon: material/brightness-4
-        name: Cambiar a modo claro
-    # Modo claro como alternativa
+        name: Switch to light mode
+    # Light mode
     - scheme: default
-      primary: indigo
+      primary: blue
       accent: light blue
       toggle:
         icon: material/brightness-7
-        name: Cambiar a modo oscuro
+        name: Switch to dark mode
   features:
     - navigation.tabs
     - navigation.sections
