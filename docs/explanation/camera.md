@@ -170,18 +170,18 @@ To move the camera in a direction, we update its position:
 **Moving forward:**
 $$
 \begin{aligned}
-\text{cam.pos.x} &+= \text{forward}_x \times \text{speed} \times \Delta t \\
-\text{cam.pos.y} &+= \text{forward}_y \times \text{speed} \times \Delta t \\
-\text{cam.pos.z} &+= \text{forward}_z \times \text{speed} \times \Delta t
+\text{cam.pos.x} &= \text{cam.pos.x} + \text{forward}_x \times \text{speed} \times \Delta t \\
+\text{cam.pos.y} &= \text{cam.pos.y} + \text{forward}_y \times \text{speed} \times \Delta t \\
+\text{cam.pos.z} &= \text{cam.pos.z} + \text{forward}_z \times \text{speed} \times \Delta t
 \end{aligned}
 $$
 
 **Strafing right:**
 $$
 \begin{aligned}
-\text{cam.pos.x} &+= \text{right}_x \times \text{speed} \times \Delta t \\
-\text{cam.pos.y} &+= \text{right}_y \times \text{speed} \times \Delta t \\
-\text{cam.pos.z} &+= \text{right}_z \times \text{speed} \times \Delta t
+\text{cam.pos.x} &= \text{cam.pos.x} + \text{right}_x \times \text{speed} \times \Delta t \\
+\text{cam.pos.y} &= \text{cam.pos.y} + \text{right}_y \times \text{speed} \times \Delta t \\
+\text{cam.pos.z} &= \text{cam.pos.z} + \text{right}_z \times \text{speed} \times \Delta t
 \end{aligned}
 $$
 
