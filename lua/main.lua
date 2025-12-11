@@ -2,7 +2,7 @@ local vec = require("vectors")
 local love = require("love")
 
 package.path = package.path .. ";../?.lua;../?/init.lua;./?.lua;./?/init.lua"
-local inspect = require("inspect")
+--local inspect = require("inspect")
 
 function love.mousemoved(_, _, dx, dy)
   local sens = 0.0015

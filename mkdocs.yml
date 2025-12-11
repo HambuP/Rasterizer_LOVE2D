@@ -112,15 +112,17 @@ extra:
             Gracias! Ayúdanos a mejorar reportando issues en GitHub.
 
 nav:
-  - Inicio: index.md
-  - Guías:
-      - Conceptos Fundamentales: conceptos.md
-      - Matemáticas Completas: matematicas.md
-  - Referencia:
+  - Home: index.md
+  - Explanation:
+      - Simple Rasterization in LOVE: explanation/rasterization.md
+      - Basics of 3D Projection: explanation/projection.md
+      - Camera and Movement: explanation/camera.md
+      - Z-Buffer: explanation/zbuffer.md
+  - Reference:
       - API de Vectores: api_vectores.md
-  - Acerca:
-      - Licencia: https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE
-      - Código Fuente: https://github.com/HambuP/Rasterizador_LOVE2D
+  - About:
+      - License: https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE
+      - Source Code: https://github.com/HambuP/Rasterizador_LOVE2D
 
 plugins:
   - search:
