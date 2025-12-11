@@ -1,6 +1,6 @@
 # 3D Software Rasterizer
 
-A simple 3D software rasterizer built from scratch in Lua using LÖVE2D. No GPU acceleration—just pure CPU rendering to understand how 3D graphics really work.
+A simple 3D software rasterizer built from scratch in Lua using LÖVE2D. No GPU acceleration—just pure CPU rendering to understand how 3D graphics work.
 
 ![Demo](./screenshots/rasterizer.gif)
 
@@ -22,4 +22,4 @@ This is a learning project, so it intentionally lacks:
 - ❌ Backface culling
 - ❌ View frustum clipping (only near plane clipping implemented)
 - ❌ Anti-aliasing
-- ❌ Transparency/alpha blending
+
