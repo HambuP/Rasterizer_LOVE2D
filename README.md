@@ -1,3 +1,4 @@
 # Simple 3D Rasterizer using LOVE2D
-Hola \n
+Esto es un epico rasterizador. 
+
 ![video demo](./screenshots/rasterizer.gif)
