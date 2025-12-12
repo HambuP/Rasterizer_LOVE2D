@@ -179,9 +179,9 @@ $$
 **Strafing right:**
 $$
 \begin{aligned}
-cam.x &= cam.x + right_x \cdot speed \cdot \Delta t \\
-cam.y &= cam.y + right_y \cdot speed \cdot \Delta t \\
-cam.z &= cam.z + right_z \cdot speed \cdot \Delta t
+cam.x = cam.x + right_x \cdot speed \cdot \Delta t \\
+cam.y = cam.y + right_y \cdot speed \cdot \Delta t \\
+cam.z = cam.z + right_z \cdot speed \cdot \Delta t
 \end{aligned}
 $$
 
