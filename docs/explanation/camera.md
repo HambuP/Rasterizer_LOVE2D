@@ -168,20 +168,22 @@ local forward = { Rcam[1][3], Rcam[2][3], Rcam[3][3] }  -- 3rd column
 To move the camera in a direction, we update its position:
 
 **Moving forward:**
+
 $$
 \begin{aligned}
-cam.x &= cam.x + forward_x \cdot speed \cdot \Delta t \\
-cam.y &= cam.y + forward_y \cdot speed \cdot \Delta t \\
-cam.z &= cam.z + forward_z \cdot speed \cdot \Delta t
+cam_x &= cam_x + forward_x \cdot speed \cdot \Delta t \\
+cam_y &= cam_y + forward_y \cdot speed \cdot \Delta t \\
+cam_z &= cam_z + forward_z \cdot speed \cdot \Delta t
 \end{aligned}
 $$
 
 **Strafing right:**
+
 $$
 \begin{aligned}
-cam.x = cam.x + right_x \cdot speed \cdot \Delta t \\
-cam.y = cam.y + right_y \cdot speed \cdot \Delta t \\
-cam.z = cam.z + right_z \cdot speed \cdot \Delta t
+cam_x &= cam_x + right_x \cdot speed \cdot \Delta t \\
+cam_y &= cam_y + right_y \cdot speed \cdot \Delta t \\
+cam_z &= cam_z + right_z \cdot speed \cdot \Delta t
 \end{aligned}
 $$
 
