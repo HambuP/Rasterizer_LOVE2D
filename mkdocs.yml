@@ -116,6 +116,7 @@ nav:
   - Explanation:
       - Simple Rasterization in LOVE: explanation/rasterization.md
       - Basics of 3D Projection: explanation/projection.md
+      - Triangle Assembly: explanation/assembly.md
       - Camera and Movement: explanation/camera.md
       - Z-Buffer: explanation/zbuffer.md
   - Reference:
