@@ -1,5 +1,5 @@
-site_name: Rasterizador LOVE2D
-site_description: Motor de renderizado 3D por software en Lua - Documentación completa con explicaciones matemáticas
+site_name: LOVE2D Software Rasterizer
+site_description: A 3D software rendering engine in Lua - Complete documentation with mathematical explanations
 site_author: HambuP
 repo_url: https://github.com/HambuP/Rasterizador_LOVE2D
 repo_name: HambuP/Rasterizador_LOVE2D
@@ -7,7 +7,7 @@ edit_uri: ""
 
 theme:
   name: material
-  language: es
+  language: en
   font:
     text: Poppins
     code: Roboto Mono
@@ -95,21 +95,21 @@ extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/HambuP/Rasterizador_LOVE2D
-      name: Repositorio en GitHub
+      name: GitHub Repository
   analytics:
     feedback:
-      title: ¿Fue útil esta página?
+      title: Was this page helpful?
       ratings:
         - icon: material/emoticon-happy-outline
-          name: Muy útil
+          name: Very helpful
           data: 1
           note: >-
-            Gracias por tu feedback!
+            Thanks for your feedback!
         - icon: material/emoticon-sad-outline
-          name: Podría mejorar
+          name: Could be improved
           data: 0
           note: >-
-            Gracias! Ayúdanos a mejorar reportando issues en GitHub.
+            Thanks! Help us improve by reporting issues on GitHub.
 
 nav:
   - Home: index.md
@@ -119,12 +119,10 @@ nav:
       - Triangle Assembly: explanation/assembly.md
       - Camera and Movement: explanation/camera.md
       - Z-Buffer: explanation/zbuffer.md
-  - Reference:
-      - API de Vectores: api_vectores.md
   - About:
       - License: https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE
       - Source Code: https://github.com/HambuP/Rasterizador_LOVE2D
 
 plugins:
   - search:
-      lang: es
+      lang: en
