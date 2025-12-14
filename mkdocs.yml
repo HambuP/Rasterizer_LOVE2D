@@ -2,7 +2,7 @@ site_name: LOVE2D Software Rasterizer
 site_description: A 3D software rendering engine in Lua - Complete documentation with mathematical explanations
 site_author: HambuP
 repo_url: https://github.com/HambuP/Rasterizador_LOVE2D
-repo_name: HambuP/Rasterizador_LOVE2D
+repo_name: HambuP/LOVE2D-Rasterizer
 edit_uri: ""
 
 theme:
