@@ -23,4 +23,4 @@ This is a learning project, so it intentionally lacks:
 - ❌ View frustum clipping (only near plane clipping implemented)
 - ❌ Anti-aliasing
 
-If you want to understand how everything works and/or want to recreate it on your own: ![Full Documentation](https://hambup.github.io/Rasterizer_LOVE2D/)
+If you want to understand how everything works and/or want to recreate this simple rasterizer on your own, I've made a **![Fully Detailed Documentation](https://hambup.github.io/Rasterizer_LOVE2D/)** with that purpose.
