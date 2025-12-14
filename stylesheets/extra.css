@@ -1,0 +1,27 @@
+/* Import Outfit font from Google Fonts for headings */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+/* Custom styles */
+:root {
+  --md-code-font-family: "Fira Code", monospace;
+}
+
+/* Apply Outfit to all headings */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 600;
+}
+
+/* Make h1 bolder */
+.md-typeset h1 {
+  font-weight: 700;
+}
+
+.md-typeset code {
+  border-radius: 0.2rem;
+}

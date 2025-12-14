@@ -1,0 +1,1720 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A 3D software rendering engine in Lua - Complete documentation with mathematical explanations">
+      
+      
+        <meta name="author" content="HambuP">
+      
+      
+      
+        <link rel="prev" href="../assembly/">
+      
+      
+        <link rel="next" href="../zbuffer/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Camera and Movement - LOVE2D Software Rasterizer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Poppins";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#camera-and-movement" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="LOVE2D Software Rasterizer" class="md-header__button md-logo" aria-label="LOVE2D Software Rasterizer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LOVE2D Software Rasterizer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Camera and Movement
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="light-blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/HambuP/Rasterizador_LOVE2D" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HambuP/LOVE2D-Rasterizer
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../rasterization/" class="md-tabs__link">
+          
+  
+  
+  Explanation
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE" class="md-tabs__link">
+          
+  
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LOVE2D Software Rasterizer" class="md-nav__button md-logo" aria-label="LOVE2D Software Rasterizer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LOVE2D Software Rasterizer
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/HambuP/Rasterizador_LOVE2D" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    HambuP/LOVE2D-Rasterizer
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Explanation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Explanation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rasterization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simple Rasterization in LOVE
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../projection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics of 3D Projection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../assembly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Triangle Assembly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Camera and Movement
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Camera and Movement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#camera-orientation-yaw-and-pitch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camera Orientation: Yaw and Pitch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-yaw-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Yaw Rotation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding Yaw Rotation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-unit-circle-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Unit Circle View
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotating-by-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotating by Angle θ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-to-any-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying to Any Point
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rotation-matrices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotation Matrices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rotation Matrices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expressing-points-as-column-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expressing Points as Column Vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaw-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yaw Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pitch-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitch Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combined-camera-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combined Camera Rotation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Combined Camera Rotation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-camera-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Camera Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extracting-camera-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting Camera Axes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#free-fly-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Free-Fly Movement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Free-Fly Movement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extracting-direction-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting Direction Vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#movement-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Movement Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#free-fly-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Free-Fly Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#point-transformation-before-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Point Transformation Before Projection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Point Transformation Before Projection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-translate-to-camera-relative-coordinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Translate to Camera-Relative Coordinates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-the-naive-approach-doesnt-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: The Naive Approach (Doesn't Work!)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-the-correct-approach-inverse-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: The Correct Approach — Inverse Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-complete-transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Complete Transformation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zbuffer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Z-Buffer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    About
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HambuP/Rasterizador_LOVE2D/blob/main/LICENSE" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/HambuP/Rasterizador_LOVE2D" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source Code
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#camera-orientation-yaw-and-pitch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Camera Orientation: Yaw and Pitch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#understanding-yaw-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Understanding Yaw Rotation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding Yaw Rotation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-unit-circle-view" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Unit Circle View
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotating-by-angle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotating by Angle θ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-to-any-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying to Any Point
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rotation-matrices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rotation Matrices
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rotation Matrices">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expressing-points-as-column-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expressing Points as Column Vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yaw-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yaw Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pitch-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pitch Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combined-camera-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combined Camera Rotation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Combined Camera Rotation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-camera-rotation-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Camera Rotation Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extracting-camera-axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting Camera Axes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#free-fly-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Free-Fly Movement
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Free-Fly Movement">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extracting-direction-vectors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extracting Direction Vectors
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#movement-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Movement Update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#free-fly-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Free-Fly Mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#point-transformation-before-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Point Transformation Before Projection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Point Transformation Before Projection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-translate-to-camera-relative-coordinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Translate to Camera-Relative Coordinates
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-the-naive-approach-doesnt-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: The Naive Approach (Doesn't Work!)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-the-correct-approach-inverse-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: The Correct Approach — Inverse Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-complete-transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Complete Transformation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="camera-and-movement">Camera and Movement<a class="headerlink" href="#camera-and-movement" title="Permanent link">&para;</a></h1>
+<p>How do we move and rotate a 3D camera? This is essential for creating an interactive 3D experience where the user can explore the scene.</p>
+<p><img alt="Camera Diagram" src="../../assets/images/camera.jpg" /></p>
+<h2 id="camera-orientation-yaw-and-pitch">Camera Orientation: Yaw and Pitch<a class="headerlink" href="#camera-orientation-yaw-and-pitch" title="Permanent link">&para;</a></h2>
+<p>A 3D camera has several rotational degrees of freedom:</p>
+<ul>
+<li><strong>Yaw</strong>: Rotation around the <strong>Y-axis</strong> (vertical) — turns the camera left and right</li>
+<li><strong>Pitch</strong>: Rotation around the <strong>X-axis</strong> (horizontal) — tilts the camera up and down</li>
+<li><strong>Roll</strong>: Rotation around the <strong>Z-axis</strong> (forward) — we'll ignore this for now</li>
+</ul>
+<p>In this rasterizer, we use <strong>yaw</strong> and <strong>pitch</strong> to control camera orientation, giving us a first-person camera system.</p>
+<hr />
+<h2 id="understanding-yaw-rotation">Understanding Yaw Rotation<a class="headerlink" href="#understanding-yaw-rotation" title="Permanent link">&para;</a></h2>
+<p>Let's start with <strong>yaw</strong> — the horizontal rotation that turns the camera left and right.</p>
+<h3 id="the-unit-circle-view">The Unit Circle View<a class="headerlink" href="#the-unit-circle-view" title="Permanent link">&para;</a></h3>
+<p>When we rotate around the Y-axis, the <strong>Y coordinate doesn't change</strong> (height stays the same). We're only rotating in the XZ plane.</p>
+<p><img alt="Unit Circle XZ Plane" src="../../assets/images/unitary%20x%20and%20z.png" /></p>
+<p>Looking down from above (the XZ plane), we can think of this as a <strong>unit circle</strong>:</p>
+<ul>
+<li>The <strong>right vector</strong> starts at <span class="arithmatex">\((1, 0, 0)\)</span> — pointing in the <span class="arithmatex">\(+X\)</span> direction</li>
+<li>The <strong>forward vector</strong> starts at <span class="arithmatex">\((0, 0, 1)\)</span> — pointing in the <span class="arithmatex">\(+Z\)</span> direction</li>
+</ul>
+<h3 id="rotating-by-angle">Rotating by Angle θ<a class="headerlink" href="#rotating-by-angle" title="Permanent link">&para;</a></h3>
+<p>If we rotate these vectors by an angle <span class="arithmatex">\(\theta\)</span> (yaw):</p>
+<ul>
+<li><strong>Right vector</strong> becomes: <span class="arithmatex">\((\cos\theta, y, \sin\theta)\)</span></li>
+<li><strong>Forward vector</strong> becomes: <span class="arithmatex">\((-\sin\theta, y, \cos\theta)\)</span></li>
+</ul>
+<h3 id="applying-to-any-point">Applying to Any Point<a class="headerlink" href="#applying-to-any-point" title="Permanent link">&para;</a></h3>
+<p>For a general 3D point <span class="arithmatex">\((x, y, z)\)</span> rotated by yaw angle <span class="arithmatex">\(\theta\)</span>:</p>
+<div class="arithmatex">\[
+\begin{aligned}
+x' &amp;= \cos(\theta) \cdot x + \sin(\theta) \cdot z \\
+y' &amp;= y \\
+z' &amp;= -\sin(\theta) \cdot x + \cos(\theta) \cdot z
+\end{aligned}
+\]</div>
+<p><strong>Key insight:</strong> The Y component stays unchanged because yaw only rotates around the Y-axis.</p>
+<hr />
+<h2 id="rotation-matrices">Rotation Matrices<a class="headerlink" href="#rotation-matrices" title="Permanent link">&para;</a></h2>
+<p>We can represent this rotation more compactly using <strong>matrix notation</strong>.</p>
+<h3 id="expressing-points-as-column-vectors">Expressing Points as Column Vectors<a class="headerlink" href="#expressing-points-as-column-vectors" title="Permanent link">&para;</a></h3>
+<p>A 3D point <span class="arithmatex">\((x, y, z)\)</span> can be written as a <strong>column vector</strong>:</p>
+<div class="arithmatex">\[
+\mathbf{v} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+\]</div>
+<h3 id="yaw-rotation-matrix">Yaw Rotation Matrix<a class="headerlink" href="#yaw-rotation-matrix" title="Permanent link">&para;</a></h3>
+<p>The yaw rotation can be expressed as a <span class="arithmatex">\(3 \times 3\)</span> matrix:</p>
+<div class="arithmatex">\[
+R_y(\theta) = \begin{bmatrix}
+\cos\theta &amp; 0 &amp; \sin\theta \\
+0 &amp; 1 &amp; 0 \\
+-\sin\theta &amp; 0 &amp; \cos\theta
+\end{bmatrix}
+\]</div>
+<p><strong>Matrix-vector multiplication</strong> gives the same result as our formulas:</p>
+<div class="arithmatex">\[
+\begin{bmatrix} x' \\ y' \\ z' \end{bmatrix} = R_y(\theta) \cdot \begin{bmatrix} x \\ y \\ z \end{bmatrix}
+\]</div>
+<p>Expanding this multiplication:</p>
+<div class="arithmatex">\[
+\begin{bmatrix} x' \\ y' \\ z' \end{bmatrix} = \begin{bmatrix}
+\cos\theta \cdot x + \sin\theta \cdot z \\
+y \\
+-\sin\theta \cdot x + \cos\theta \cdot z
+\end{bmatrix}
+\]</div>
+<p>This matches our rotation formulas exactly!</p>
+<h3 id="pitch-rotation-matrix">Pitch Rotation Matrix<a class="headerlink" href="#pitch-rotation-matrix" title="Permanent link">&para;</a></h3>
+<p>Using the same technique for <strong>pitch</strong> (rotation around the X-axis), we get:</p>
+<div class="arithmatex">\[
+R_x(\phi) = \begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \cos\phi &amp; -\sin\phi \\
+0 &amp; \sin\phi &amp; \cos\phi
+\end{bmatrix}
+\]</div>
+<p>Where <span class="arithmatex">\(\phi\)</span> is the pitch angle.</p>
+<hr />
+<h2 id="combined-camera-rotation">Combined Camera Rotation<a class="headerlink" href="#combined-camera-rotation" title="Permanent link">&para;</a></h2>
+<p>To represent the full camera orientation, we combine both rotations into a single matrix.</p>
+<h3 id="the-camera-rotation-matrix">The Camera Rotation Matrix<a class="headerlink" href="#the-camera-rotation-matrix" title="Permanent link">&para;</a></h3>
+<div class="arithmatex">\[
+R_{cam} = R_y(\text{yaw}) \times R_x(\text{pitch})
+\]</div>
+<p><strong>Important:</strong> The <strong>order matters</strong>! Matrix multiplication is <strong>not commutative</strong>:</p>
+<div class="arithmatex">\[
+R_y \times R_x \neq R_x \times R_y
+\]</div>
+<p>We apply yaw first, then pitch. This matches the intuitive behavior of a first-person camera.</p>
+<h3 id="extracting-camera-axes">Extracting Camera Axes<a class="headerlink" href="#extracting-camera-axes" title="Permanent link">&para;</a></h3>
+<p>The resulting <span class="arithmatex">\(R_{cam}\)</span> matrix has a useful property: its <strong>columns</strong> represent the camera's local coordinate axes:</p>
+<div class="arithmatex">\[
+R_{cam} = \begin{bmatrix}
+| &amp; | &amp; | \\
+\text{right} &amp; \text{up} &amp; \text{forward} \\
+| &amp; | &amp; |
+\end{bmatrix}
+\]</div>
+<ul>
+<li><strong>1st column</strong>: Right vector (camera's local X-axis)</li>
+<li><strong>2nd column</strong>: Up vector (camera's local Y-axis)</li>
+<li><strong>3rd column</strong>: Forward vector (camera's local Z-axis)</li>
+</ul>
+<p>These vectors tell us which direction the camera is facing in world space.</p>
+<hr />
+<h2 id="free-fly-movement">Free-Fly Movement<a class="headerlink" href="#free-fly-movement" title="Permanent link">&para;</a></h2>
+<p>Now that we have the camera's orientation, we can implement movement.</p>
+<h3 id="extracting-direction-vectors">Extracting Direction Vectors<a class="headerlink" href="#extracting-direction-vectors" title="Permanent link">&para;</a></h3>
+<p>From the camera rotation matrix <span class="arithmatex">\(R_{cam}\)</span>, we extract:</p>
+<div class="language-lua highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">local</span><span class="w"> </span><span class="nv">right</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">-- 1st column</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">local</span><span class="w"> </span><span class="nv">forward</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">-- 3rd column</span>
+</span></code></pre></div>
+<h3 id="movement-update">Movement Update<a class="headerlink" href="#movement-update" title="Permanent link">&para;</a></h3>
+<p>To move the camera in a direction, we update its position:</p>
+<p><strong>Moving forward:</strong></p>
+<div class="arithmatex">\[
+\begin{aligned}
+cam_x &amp;= cam_x + forward_x \cdot speed \cdot \Delta t \\
+cam_y &amp;= cam_y + forward_y \cdot speed \cdot \Delta t \\
+cam_z &amp;= cam_z + forward_z \cdot speed \cdot \Delta t
+\end{aligned}
+\]</div>
+<p><strong>Strafing right:</strong></p>
+<div class="arithmatex">\[
+\begin{aligned}
+cam_x &amp;= cam_x + right_x \cdot speed \cdot \Delta t \\
+cam_y &amp;= cam_y + right_y \cdot speed \cdot \Delta t \\
+cam_z &amp;= cam_z + right_z \cdot speed \cdot \Delta t
+\end{aligned}
+\]</div>
+<p>Where <span class="arithmatex">\(\Delta t\)</span> is the time elapsed since the last frame (delta time).</p>
+<h3 id="free-fly-mode">Free-Fly Mode<a class="headerlink" href="#free-fly-mode" title="Permanent link">&para;</a></h3>
+<p>This gives us <strong>free-fly movement</strong> — the camera can move in any direction, including up and down. It's not locked to the ground plane like a walking character would be.</p>
+<p>For example, if you pitch the camera upward and press forward, you'll fly upward into the sky!</p>
+<hr />
+<h2 id="point-transformation-before-projection">Point Transformation Before Projection<a class="headerlink" href="#point-transformation-before-projection" title="Permanent link">&para;</a></h2>
+<p>Before we can project a 3D point to the screen, we need to transform it into <strong>camera space</strong>.</p>
+<h3 id="step-1-translate-to-camera-relative-coordinates">Step 1: Translate to Camera-Relative Coordinates<a class="headerlink" href="#step-1-translate-to-camera-relative-coordinates" title="Permanent link">&para;</a></h3>
+<p>First, express the point <strong>relative to the camera's position</strong>:</p>
+<div class="arithmatex">\[
+\mathbf{p}_{rel} = \mathbf{p}_{world} - \mathbf{cam.pos}
+\]</div>
+<p>This moves the camera to the origin <span class="arithmatex">\((0, 0, 0)\)</span>.</p>
+<h3 id="step-2-the-naive-approach-doesnt-work">Step 2: The Naive Approach (Doesn't Work!)<a class="headerlink" href="#step-2-the-naive-approach-doesnt-work" title="Permanent link">&para;</a></h3>
+<p>You might think we should rotate the point using <span class="arithmatex">\(R_{cam}\)</span>:</p>
+<div class="arithmatex">\[
+\mathbf{p}_{camera} = R_{cam} \times \mathbf{p}_{rel} \quad \text{❌ WRONG!}
+\]</div>
+<p><strong>Why doesn't this work?</strong></p>
+<p>When the camera moves to the <strong>right</strong>, objects in the scene should appear to move <strong>left</strong> on the screen. Similarly, when the camera looks up, objects should move down on screen.</p>
+<p>The world rotates in the <strong>opposite direction</strong> of the camera!</p>
+<h3 id="step-3-the-correct-approach-inverse-rotation">Step 3: The Correct Approach — Inverse Rotation<a class="headerlink" href="#step-3-the-correct-approach-inverse-rotation" title="Permanent link">&para;</a></h3>
+<p>We need to multiply by the <strong>inverse</strong> of the camera rotation:</p>
+<div class="arithmatex">\[
+\mathbf{p}_{camera} = R_{cam}^{-1} \times \mathbf{p}_{rel}
+\]</div>
+<p><strong>Key property:</strong> For rotation matrices, the inverse equals the <strong>transpose</strong>:</p>
+<div class="arithmatex">\[
+R_{cam}^{-1} = R_{cam}^T
+\]</div>
+<p>This is because rotation matrices are <strong>orthogonal</strong> (their columns are perpendicular unit vectors).</p>
+<h3 id="the-complete-transformation">The Complete Transformation<a class="headerlink" href="#the-complete-transformation" title="Permanent link">&para;</a></h3>
+<p>Putting it together:</p>
+<div class="arithmatex">\[
+\mathbf{p}_{camera} = R_{cam}^T \times (\mathbf{p}_{world} - \mathbf{cam.pos})
+\]</div>
+<p><strong>Remember:</strong> The order of operations matters! We translate first, then rotate.</p>
+<hr />
+<h2 id="complete-algorithm">Complete Algorithm<a class="headerlink" href="#complete-algorithm" title="Permanent link">&para;</a></h2>
+<p>Here's how the full camera transformation works in code:</p>
+<div class="language-lua highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">-- Step 1: Build the camera rotation matrices</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">build_cam_mats</span><span class="p">()</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">Ry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">rota_y</span><span class="p">(</span><span class="nv">cam</span><span class="p">.</span><span class="py">yaw</span><span class="p">)</span><span class="w">         </span><span class="c1">-- Yaw rotation matrix</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">Rx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">rota_x</span><span class="p">(</span><span class="nv">cam</span><span class="p">.</span><span class="py">pitch</span><span class="p">)</span><span class="w">       </span><span class="c1">-- Pitch rotation matrix</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">Rcam</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">mat3_mul</span><span class="p">(</span><span class="nv">Ry</span><span class="p">,</span><span class="w"> </span><span class="nv">Rx</span><span class="p">)</span><span class="w">      </span><span class="c1">-- Combined: Rcam = Ry × Rx</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">RcamT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">transpose</span><span class="p">(</span><span class="nv">Rcam</span><span class="p">)</span><span class="w">      </span><span class="c1">-- Inverse rotation (transpose)</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">,</span><span class="w"> </span><span class="nv">RcamT</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kr">end</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1">-- Step 2: Extract movement directions</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="kd">local</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">,</span><span class="w"> </span><span class="nv">RcamT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">build_cam_mats</span><span class="p">()</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="kd">local</span><span class="w"> </span><span class="nv">right</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="kd">local</span><span class="w"> </span><span class="nv">forward</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="nv">Rcam</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="c1">-- Step 3: Update camera position based on input</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="kd">local</span><span class="w"> </span><span class="nv">speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="kr">if</span><span class="w"> </span><span class="nv">love</span><span class="p">.</span><span class="py">keyboard</span><span class="p">.</span><span class="nf">isDown</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">forward</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">speed</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">dt</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">  </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">y</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">forward</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">speed</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">dt</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">  </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">z</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">forward</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">speed</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nv">dt</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="kr">end</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="c1">-- Step 4: Transform world point to camera space</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">transform_to_camera_space</span><span class="p">(</span><span class="nv">point_world</span><span class="p">,</span><span class="w"> </span><span class="nv">cam</span><span class="p">,</span><span class="w"> </span><span class="nv">RcamT</span><span class="p">)</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">  </span><span class="c1">-- Translate to camera-relative coordinates</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">rel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">    </span><span class="nv">point_world</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">x</span><span class="p">,</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">    </span><span class="nv">point_world</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">y</span><span class="p">,</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">    </span><span class="nv">point_world</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">cam</span><span class="p">.</span><span class="py">pos</span><span class="p">.</span><span class="py">z</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="w">  </span><span class="c1">-- Apply inverse camera rotation (transpose)</span>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">point_camera</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">mat3_vec</span><span class="p">(</span><span class="nv">rel</span><span class="p">,</span><span class="w"> </span><span class="nv">RcamT</span><span class="p">)</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="nv">point_camera</span>
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a><span class="kr">end</span>
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a><span class="c1">-- Step 5: Project to screen (from previous chapter)</span>
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a><span class="kd">local</span><span class="w"> </span><span class="kr">function</span><span class="w"> </span><span class="nf">project_to_screen</span><span class="p">(</span><span class="nv">point_camera</span><span class="p">,</span><span class="w"> </span><span class="nv">fov</span><span class="p">,</span><span class="w"> </span><span class="nv">width</span><span class="p">,</span><span class="w"> </span><span class="nv">height</span><span class="p">)</span>
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">x</span><span class="p">,</span><span class="w"> </span><span class="nv">y</span><span class="p">,</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">point_camera</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="nv">point_camera</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="nv">point_camera</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a><span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="nv">z</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mf">0.001</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span><span class="w"> </span><span class="kr">end</span><span class="w">  </span><span class="c1">-- Behind camera</span>
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">math.tan</span><span class="p">(</span><span class="nb">math.rad</span><span class="p">(</span><span class="nv">fov</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">x_proj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">f</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">z</span><span class="p">)</span>
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">y_proj</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">f</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nv">y</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nv">z</span><span class="p">)</span>
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">x_screen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">x_proj</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nv">width</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a><span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">y_screen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">height</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">y_proj</span>
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a><span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="nv">x_screen</span><span class="p">,</span><span class="w"> </span><span class="nv">y_screen</span>
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a><span class="kr">end</span>
+</span></code></pre></div>
+<hr />
+<h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
+<p>The camera transformation pipeline:</p>
+<ol>
+<li><strong>Build rotation matrices</strong> from yaw and pitch angles</li>
+<li><strong>Combine them</strong>: <span class="arithmatex">\(R_{cam} = R_y(\text{yaw}) \times R_x(\text{pitch})\)</span></li>
+<li><strong>Extract direction vectors</strong> from <span class="arithmatex">\(R_{cam}\)</span> columns for movement</li>
+<li><strong>Transform points to camera space</strong>: <span class="arithmatex">\(R_{cam}^T \times (\mathbf{p}_{world} - \mathbf{cam.pos})\)</span></li>
+<li><strong>Project to screen</strong> using perspective projection</li>
+</ol>
+<p><strong>Key insights:</strong></p>
+<ul>
+<li>Yaw rotates around Y-axis (left/right)</li>
+<li>Pitch rotates around X-axis (up/down)</li>
+<li>Matrix columns give us the camera's local axes (right, up, forward)</li>
+<li>We use the <strong>transpose</strong> (inverse) of <span class="arithmatex">\(R_{cam}\)</span> to transform points correctly</li>
+<li>Matrix multiplication order <strong>matters</strong></li>
+</ul>
+<p>With this camera system, we can now freely navigate our 3D scene and view it from any angle!</p>
+<p><strong>Next:</strong> We'll explore the Z-buffer algorithm for correctly sorting overlapping triangles by depth.</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="Very helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="Could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks! Help us improve by reporting issues on GitHub.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/HambuP/Rasterizador_LOVE2D" target="_blank" rel="noopener" title="GitHub Repository" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.tracking", "navigation.expand", "search.suggest", "search.highlight", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
